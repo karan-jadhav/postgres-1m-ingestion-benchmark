@@ -132,7 +132,7 @@ Generated files are written to `results/`:
 - `summary.csv`: chart/table source
 - `summary.md`: Markdown summary table
 - `environment.md`: command, dataset, Python, Docker, PostgreSQL, CPU, memory,
-  and filesystem details
+  EC2 metadata when available, and storage/filesystem details
 
 ## Full benchmark command
 
