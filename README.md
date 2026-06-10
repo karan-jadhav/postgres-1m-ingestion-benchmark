@@ -3,7 +3,8 @@
 Question: how far can PostgreSQL ingest be pushed?
 
 This repo loads real GitHub event data into PostgreSQL 18 through a sequence of
-ingestion paths. Each step changes one major bottleneck:
+ingestion paths. Each step changes the shape of the write path and removes one
+major bottleneck:
 
 - naive `INSERT`: baseline
 - batched `INSERT`: fewer client/server round trips
@@ -16,7 +17,19 @@ The harness starts a fresh Docker volume for every method and every repetition.
 That resets PostgreSQL data and WAL state. It does not fully clear the host OS
 page cache, so the result files emphasize repeated runs and medians.
 
-The benchmark runs one focused ingestion ladder and writes reproducible result files.
+Full write-up:
+[1M rows into Postgres in 1.29 seconds](https://jadhav.dev/blog/postgres-copy-ingest/1m-rows-into-postgres-in-1-29-seconds)
+
+Example result from one benchmark run on `m7i.2xlarge` with PostgreSQL 18.4:
+
+| Method | Median ingest time | Rows/sec |
+| --- | ---: | ---: |
+| Naive `INSERT` | 16.95 min | 983 |
+| Production `COPY` | 3.91 s | 255,460 |
+| Raw landing `COPY` | 1.29 s | 773,893 |
+
+The raw landing case loads the same CSV into an all-text staging table. It is
+included to show how much type conversion can cost during the hot ingest path.
 
 ## Setup
 
